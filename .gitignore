@@ -1,0 +1,13 @@
+# Ignore build directories.
+*build*/
+
+# Ignore local caches and editor metadata.
+.cache/
+.vscode/
+.idea/
+
+# Ignore local artifacts and secrets.
+.artifacts/
+
+# Ignore local Codex marker.
+.codex
