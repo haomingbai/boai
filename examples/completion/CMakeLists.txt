@@ -1,2 +1,0 @@
-add_executable(example_boai_completion completion.cc)
-target_link_libraries(example_boai_completion PRIVATE boai)

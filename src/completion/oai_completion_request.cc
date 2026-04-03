@@ -43,7 +43,11 @@ void BuildRequestToolCallObject(const OaiToolCall& call,
 
   json::object function_obj;
   function_obj["name"] = call.name;
-  function_obj["arguments"] = call.arguments;
+  if (call.arguments.is_string()) {
+    function_obj["arguments"] = call.arguments;
+  } else {
+    function_obj["arguments"] = json::serialize(call.arguments);
+  }
 
   call_obj["function"] = std::move(function_obj);
   *call_obj_out = std::move(call_obj);
@@ -77,6 +81,10 @@ void BuildRequestMessageObject(const OaiMessage& message,
     json::array tool_calls;
     BuildRequestToolCallsArray(message.tool_calls, &tool_calls);
     msg["tool_calls"] = std::move(tool_calls);
+  }
+
+  if (!message.tool_call_id.empty()) {
+    msg["tool_call_id"] = message.tool_call_id;
   }
 
   *msg_out = std::move(msg);

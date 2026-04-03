@@ -80,6 +80,7 @@ struct OaiMessage {
   std::string message;
   std::vector<OaiToolCall> tool_calls;
   std::string reasoning;
+  std::string tool_call_id;
 };
 
 /**

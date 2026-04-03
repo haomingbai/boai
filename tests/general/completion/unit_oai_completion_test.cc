@@ -272,6 +272,74 @@ TEST(OaiCompletionTest, CompletionParsesToolCalls) {
             "Beijing");
 }
 
+TEST(OaiCompletionTest, CompletionSendsToolCallHistoryAndToolResultMessages) {
+  auto server = bsrvcore::AllocateUnique<bsrvcore::HttpServer>(2);
+  auto captured_body = bsrvcore::AllocateShared<std::string>();
+
+  server->AddRouteEntry(
+      bsrvcore::HttpRequestMethod::kPost, "/chat/completions",
+      [captured_body](std::shared_ptr<bsrvcore::HttpServerTask> task) {
+        *captured_body = task->GetRequest().body();
+        task->SetField(http::field::content_type, "application/json");
+        task->SetBody(
+            R"({"id":"req-tool-roundtrip","model":"unit-test-model","choices":[{"finish_reason":"stop","message":{"role":"assistant","content":"done"}}]})");
+      });
+
+  ServerGuard guard(std::move(server));
+  const auto port = StartServerWithRoutes(guard);
+
+  boost::asio::io_context ioc;
+  OaiCompletionFactory factory(ioc.get_executor(), MakeInfo(port));
+
+  OaiMessage user{"user", "please call a tool", {}, ""};
+  auto state = factory.AppendMessage(user, nullptr);
+
+  OaiMessage assistant;
+  assistant.role = "assistant";
+  assistant.tool_calls.push_back(OaiToolCall{
+      "call_1", "get_weather", json::object{{"city", "Beijing"}}});
+  state = factory.AppendMessage(assistant, state);
+
+  OaiMessage tool;
+  tool.role = "tool";
+  tool.message = R"({"city":"Beijing","temperature_c":22})";
+  tool.tool_call_id = "call_1";
+  state = factory.AppendMessage(tool, state);
+
+  int callback_count = 0;
+  auto result =
+      WaitCompletion(ioc, factory, state, MakeModelInfo(), {}, &callback_count);
+
+  ASSERT_NE(result, nullptr);
+  EXPECT_EQ(callback_count, 1);
+  EXPECT_EQ(result->GetLog().status, OaiCompletionStatus::kSuccess);
+
+  boost::system::error_code ec;
+  auto root = json::parse(*captured_body, ec);
+  ASSERT_FALSE(ec);
+  ASSERT_TRUE(root.is_object());
+
+  const auto& obj = root.as_object();
+  const auto& messages = obj.at("messages").as_array();
+  ASSERT_EQ(messages.size(), 3U);
+
+  const auto& assistant_message = messages[1].as_object();
+  const auto& assistant_tool_calls =
+      assistant_message.at("tool_calls").as_array();
+  ASSERT_EQ(assistant_tool_calls.size(), 1U);
+  const auto& function_obj =
+      assistant_tool_calls.front().as_object().at("function").as_object();
+  ASSERT_TRUE(function_obj.at("arguments").is_string());
+  EXPECT_EQ(function_obj.at("arguments").as_string(),
+            "{\"city\":\"Beijing\"}");
+
+  const auto& tool_message = messages[2].as_object();
+  EXPECT_EQ(tool_message.at("role").as_string(), "tool");
+  EXPECT_EQ(tool_message.at("content").as_string(),
+            "{\"city\":\"Beijing\",\"temperature_c\":22}");
+  EXPECT_EQ(tool_message.at("tool_call_id").as_string(), "call_1");
+}
+
 TEST(OaiCompletionTest, CompletionPreservesInvalidToolCallArgumentString) {
   auto server = bsrvcore::AllocateUnique<bsrvcore::HttpServer>(2);
 

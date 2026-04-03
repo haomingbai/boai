@@ -3,7 +3,7 @@
 This chapter maps to:
 
 - `include/boai/completion/oai_completion.h`
-- `examples/completion/completion.cc`
+- `examples/deepseek_demo/deepseek_demo.cc`
 
 ## One-sentence idea
 
@@ -14,7 +14,8 @@ This chapter maps to:
 
 - `OaiCompletionInfo`: provider connection info (`base_url`, `api_key`, ...)
 - `OaiModelInfo`: model name plus model-specific JSON parameters
-- `OaiMessage`: one chat message (`role`, `message`, `tool_calls`, `reasoning`)
+- `OaiMessage`: one chat message (`role`, `message`, `tool_calls`, `reasoning`,
+  `tool_call_id`)
 - `OaiCompletionState`: one immutable node (message + request log + previous state)
 - `OaiRequestLog`: HTTP status, error message, request id, finish reason, timestamp, ...
 
@@ -93,6 +94,14 @@ There are overloads that accept a `std::vector<OaiToolDefinition>`.
 When the provider responds with tool calls, the final assistant message contains
 `OaiToolCall` entries with the accumulated JSON `arguments`.
 
+If you want to continue the conversation after executing a tool locally, append:
+
+1. the assistant message containing `tool_calls`
+2. one or more `role="tool"` messages with `tool_call_id` populated
+
+When request history is re-serialized, `tool_calls[*].function.arguments` is
+encoded back into the string form expected by OpenAI/DeepSeek-compatible APIs.
+
 ## Reasoning (reasoning_content)
 
 Some providers (notably reasoning-focused models such as `deepseek-reasoner`)
@@ -106,37 +115,75 @@ The 3-argument stream overload (`on_done` + `on_delta`) remains **content-only**
 If you want reasoning deltas, use the 4-argument overload with
 `on_reasoning_delta`.
 
-## Example program
+## deepseek-demo
+
+`deepseek-demo` is a small CLI built on top of `OaiCompletionFactory`. It:
+
+- defaults to DeepSeek-friendly settings (`https://api.deepseek.com`,
+  `deepseek-chat`)
+- exposes a few cross-platform local tools:
+  `get_current_time`, `calculate`, `random_number`, `text_stats`,
+  `system_info`
+- automatically executes assistant `tool_calls` and appends tool results back
+  into the conversation
+- supports one-shot and interactive modes
+
+List tools:
+
+```bash
+./build/examples/deepseek_demo/deepseek-demo --list_tools
+```
+
+Run a one-shot prompt:
+
+```bash
+DEEPSEEK_API_KEY=... ./build/examples/deepseek_demo/deepseek-demo \
+  --user "现在几点了？如果方便，调用工具确认。"
+```
+
+Run a tool-heavy prompt:
+
+```bash
+DEEPSEEK_API_KEY=... ./build/examples/deepseek_demo/deepseek-demo \
+  --user "帮我算 128*37，再随机抽一个 1 到 20 的数字，最后总结一下。"
+```
+
+Run interactive mode:
+
+```bash
+DEEPSEEK_API_KEY=... ./build/examples/deepseek_demo/deepseek-demo --interactive
+```
+
+Commands inside interactive mode:
+
+- `:tools`
+- `:reset`
+- `:quit`
+
+You can still use stream mode and reasoning output:
 
 Build examples:
 
 ```bash
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBSRVCORE_BUILD_EXAMPLES=ON
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DBOAI_BUILD_EXAMPLES=ON
 cmake --build build --parallel
 ```
 
 Run:
 
 ```bash
-OAI_API_KEY=... ./build/examples/completion/example_boai_completion \
-  --base_url https://api.deepseek.com \
-  --model deepseek-chat \
-  --user "Hello"
-
-OAI_API_KEY=... ./build/examples/completion/example_boai_completion \
-  --base_url https://api.deepseek.com \
+DEEPSEEK_API_KEY=... ./build/examples/deepseek_demo/deepseek-demo \
   --model deepseek-reasoner \
-  --user "Solve: 25*17" \
+  --user "Solve: 25*17 and show your chain of thought if the provider returns it." \
   --print_reasoning
 
-OAI_API_KEY=... ./build/examples/completion/example_boai_completion \
-  --base_url https://api.deepseek.com \
-  --model deepseek-chat \
-  --user "Hello" \
+DEEPSEEK_API_KEY=... ./build/examples/deepseek_demo/deepseek-demo \
+  --user "Tell me something about this runtime and use any helpful tools." \
   --stream
 ```
 
 Note: passing API keys on the command line can be visible to other users via
-process listings. Prefer `OAI_API_KEY=...` when possible.
+process listings. Prefer `DEEPSEEK_API_KEY=...` or `OAI_API_KEY=...` when
+possible.
 
 Next: [Examples](examples.md).

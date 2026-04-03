@@ -1,1 +1,1 @@
-add_subdirectory(completion)
+add_subdirectory(deepseek_demo)

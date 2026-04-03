@@ -1,7 +1,3 @@
 boai_add_test(unit_oai_completion_test unit_oai_completion_test.cc unit)
 boai_add_test(integration_oai_completion_deepseek_test
   integration_oai_completion_deepseek_test.cc integration)
-
-target_link_libraries(unit_oai_completion_test PRIVATE Boost::json)
-target_link_libraries(integration_oai_completion_deepseek_test PRIVATE
-  Boost::json)

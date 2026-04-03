@@ -60,6 +60,10 @@ cmake --build build --parallel
 cmake --install build --prefix /tmp/boai-install
 ```
 
-## Example
+## Demo
+
+The example program is now `deepseek-demo`, a DeepSeek-oriented CLI that can
+declare local tools, execute model-issued tool calls, and feed tool results
+back into `/chat/completions`.
 
 See [docs/manual/oai-completion.md](docs/manual/oai-completion.md).
