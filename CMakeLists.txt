@@ -48,7 +48,7 @@ set(BOAI_BSRVCORE_SOURCE_DIR "" CACHE PATH
 set(BOAI_BSRVCORE_GIT_REPOSITORY "https://github.com/haomingbai/bsrvcore.git"
   CACHE STRING "Git repository used when boai fetches bsrvcore."
 )
-set(BOAI_BSRVCORE_GIT_TAG "v0.13.0"
+set(BOAI_BSRVCORE_GIT_TAG "v0.14.0"
   CACHE STRING "Git ref used when boai fetches bsrvcore."
 )
 

@@ -76,8 +76,8 @@ bool OaiCompletionFactory::FetchCompletion(
   options.read_header_timeout = std::chrono::seconds(10);
   options.read_body_timeout = std::chrono::seconds(60);
 
-  auto task = HttpClientTask::CreateFromUrl(
-      executor_, *ssl_ctx_, detail::BuildCompletionsUrl(info_->base_url),
+    auto task = HttpClientTask::CreateFromUrl(
+      executor_, ssl_ctx_, detail::BuildCompletionsUrl(info_->base_url),
       http::verb::post, options);
 
   auto& request = task->Request();
@@ -220,8 +220,8 @@ bool OaiCompletionFactory::FetchStreamCompletion(
   options.read_header_timeout = std::chrono::seconds(10);
   options.read_body_timeout = std::chrono::seconds(60);
 
-  auto client = HttpSseClientTask::CreateFromUrl(
-      executor_, *ssl_ctx_, detail::BuildCompletionsUrl(info_->base_url),
+    auto client = HttpSseClientTask::CreateFromUrl(
+      executor_, ssl_ctx_, detail::BuildCompletionsUrl(info_->base_url),
       options);
 
   auto& request = client->Request();

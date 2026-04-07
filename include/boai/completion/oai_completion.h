@@ -23,7 +23,7 @@
 #include <string>
 #include <vector>
 
-#include "bsrvcore/json.h"
+#include "bsrvcore/core/types.h"
 
 namespace boai::completion {
 

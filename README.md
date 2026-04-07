@@ -44,7 +44,7 @@ You can override the fetch source and ref:
 ```bash
 cmake -S . -B build \
   -DBOAI_BSRVCORE_GIT_REPOSITORY=https://github.com/haomingbai/bsrvcore.git \
-  -DBOAI_BSRVCORE_GIT_TAG=v0.13.0
+  -DBOAI_BSRVCORE_GIT_TAG=v0.14.0
 ```
 
 ## Build
