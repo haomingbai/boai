@@ -24,6 +24,7 @@ using boai::completion::OaiCompletionState;
 using boai::completion::OaiCompletionStatus;
 using boai::completion::OaiMessage;
 using boai::completion::OaiModelInfo;
+using boai::completion::OaiToolCall;
 using boai::completion::OaiToolDefinition;
 using boai::test::ServerGuard;
 using boai::test::StartServerWithRoutes;

@@ -41,6 +41,11 @@ int main(int argc, char** argv) {
   if (!options.project.empty()) {
     info->project = options.project;
   }
+  if (!options.proxy_host.empty()) {
+    info->proxy.host = options.proxy_host;
+    info->proxy.port = options.proxy_port;
+    info->proxy.auth = options.proxy_auth;
+  }
 
   auto model_info = bsrvcore::AllocateShared<completion::OaiModelInfo>();
   model_info->model = options.model;

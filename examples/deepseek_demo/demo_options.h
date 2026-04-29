@@ -12,6 +12,9 @@ struct Options {
   std::string project;
   std::string system;
   std::string user;
+  std::string proxy_host;
+  std::string proxy_port;
+  std::string proxy_auth;
   bool stream{false};
   bool interactive{false};
   bool list_tools{false};

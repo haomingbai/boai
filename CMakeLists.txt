@@ -48,7 +48,7 @@ set(BOAI_BSRVCORE_SOURCE_DIR "" CACHE PATH
 set(BOAI_BSRVCORE_GIT_REPOSITORY "https://github.com/haomingbai/bsrvcore.git"
   CACHE STRING "Git repository used when boai fetches bsrvcore."
 )
-set(BOAI_BSRVCORE_GIT_TAG "v0.16.0"
+set(BOAI_BSRVCORE_GIT_TAG "v0.18.2"
   CACHE STRING "Git ref used when boai fetches bsrvcore."
 )
 
@@ -128,6 +128,7 @@ message(STATUS "boai resolved bsrvcore via ${BOAI_BSRVCORE_RESOLUTION_MODE}")
 
 add_library(boai
   ${CMAKE_CURRENT_SOURCE_DIR}/src/completion/oai_completion.cc
+  ${CMAKE_CURRENT_SOURCE_DIR}/src/completion/oai_completion_detail.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/src/completion/oai_completion_request.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/src/completion/oai_completion_response.cc
   ${CMAKE_CURRENT_SOURCE_DIR}/src/completion/oai_completion_factory.cc

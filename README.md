@@ -1,10 +1,11 @@
 # boai
 
 `boai` is a standalone OAI chat-completions facade built on top of
-`bsrvcore` client APIs.
+`bsrvcore` client APIs, using its three-stage Assembler/Builder/Task
+architecture with optional proxy support.
 
-`boai` supports `bsrvcore` `v0.14.0` through `v0.16.0`. When `boai` falls back
-to automatic dependency fetching, it now defaults to `bsrvcore v0.16.0`.
+`boai` requires `bsrvcore` `v0.18.2`. When `boai` falls back to automatic
+dependency fetching, it defaults to `bsrvcore v0.18.2`.
 
 It ships as a normal CMake library package:
 
@@ -47,7 +48,7 @@ You can override the fetch source and ref:
 ```bash
 cmake -S . -B build \
   -DBOAI_BSRVCORE_GIT_REPOSITORY=https://github.com/haomingbai/bsrvcore.git \
-  -DBOAI_BSRVCORE_GIT_TAG=v0.16.0
+  -DBOAI_BSRVCORE_GIT_TAG=v0.18.2
 ```
 
 ## Build

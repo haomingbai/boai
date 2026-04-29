@@ -19,13 +19,32 @@
 #include <vector>
 
 #include "bsrvcore/connection/client/http_sse_client_task.h"
+#include "bsrvcore/connection/client/request_assembler.h"
 #include "bsrvcore/connection/client/sse_event_parser.h"
+#include "bsrvcore/connection/client/stream_builder.h"
+#include "bsrvcore/connection/client/stream_slot.h"
 #include "boai/completion/oai_completion.h"
 
 namespace boai::completion::detail {
 
 using bsrvcore::HttpSseClientTask;
 using bsrvcore::SseEventParser;
+
+struct ParsedUrl {
+  std::string scheme;
+  std::string host;
+  std::string port;
+  std::string target;
+};
+
+struct ConnectionPipeline {
+  std::shared_ptr<bsrvcore::RequestAssembler> assembler;
+  std::shared_ptr<bsrvcore::StreamBuilder> builder;
+};
+
+ParsedUrl ParseUrl(const std::string& url);
+ConnectionPipeline CreateConnectionPipeline(const OaiCompletionInfo& info,
+                                            const std::string& scheme);
 
 struct ToolCallAccumulator {
   std::string id;

@@ -8,16 +8,21 @@ This chapter maps to:
 ## One-sentence idea
 
 `OaiCompletionFactory` is a small facade that calls **DeepSeek/OpenAI compatible**
-`/chat/completions` APIs and returns an immutable `OaiCompletionState` chain.
+`/chat/completions` APIs using `bsrvcore`'s three-stage client architecture
+(Assembler → Builder → Task) and returns an immutable `OaiCompletionState` chain.
+
+Requires `bsrvcore` `v0.18.2`.
 
 ## Data model
 
-- `OaiCompletionInfo`: provider connection info (`base_url`, `api_key`, ...)
+- `OaiCompletionInfo`: provider connection info (`base_url`, `api_key`, ..., `proxy`)
 - `OaiModelInfo`: model name plus model-specific JSON parameters
 - `OaiMessage`: one chat message (`role`, `message`, `tool_calls`, `reasoning`,
   `tool_call_id`)
 - `OaiCompletionState`: one immutable node (message + request log + previous state)
 - `OaiRequestLog`: HTTP status, error message, request id, finish reason, timestamp, ...
+- `OaiToolDefinition`: tool name, description, and JSON Schema `parameters`
+- `OaiToolCall`: tool call `id`, `name`, and parsed `arguments`
 
 ## Base URL
 
@@ -31,6 +36,27 @@ So if your provider expects a `/v1` prefix, pass `base_url` with that suffix:
 
 - `https://api.openai.com/v1`
 - `https://api.deepseek.com` (provider-dependent)
+
+## Proxy
+
+`OaiCompletionInfo::proxy` (`bsrvcore::ProxyConfig`) enables routing requests
+through an HTTP or HTTPS proxy.
+
+```cpp
+completion::OaiCompletionInfo info;
+info.base_url = "https://api.deepseek.com";
+info.api_key = "sk-...";
+
+// Optional: pass through a local proxy
+info.proxy.host = "127.0.0.1";
+info.proxy.port = "7890";
+info.proxy.auth = "Basic dXNlcjpwYXNz";  // Optional proxy authentication
+```
+
+Internally, `boai` constructs a `ProxyRequestAssembler` and (for HTTPS targets)
+a `ProxyStreamBuilder`, which handle absolute-form target rewriting (HTTP proxy)
+or CONNECT tunnel establishment (HTTPS proxy). When `proxy.host` is empty, the
+default direct connection path is used with no overhead.
 
 ## Build an immutable message chain
 
@@ -185,5 +211,25 @@ DEEPSEEK_API_KEY=... ./build/examples/deepseek_demo/deepseek-demo \
 Note: passing API keys on the command line can be visible to other users via
 process listings. Prefer `DEEPSEEK_API_KEY=...` or `OAI_API_KEY=...` when
 possible.
+
+### Using a proxy
+
+```bash
+DEEPSEEK_API_KEY=... ./build/examples/deepseek_demo/deepseek-demo \
+  --proxy_host 127.0.0.1 --proxy_port 7890 \
+  --user "Hello, what's the weather like?"
+
+# With proxy authentication
+DEEPSEEK_API_KEY=... ./build/examples/deepseek_demo/deepseek-demo \
+  --proxy_host 127.0.0.1 --proxy_port 7890 \
+  --proxy_auth "Basic dXNlcjpwYXNz" \
+  --user "Hello"
+
+# Or via environment variables
+export BOAI_PROXY_HOST=127.0.0.1
+export BOAI_PROXY_PORT=7890
+DEEPSEEK_API_KEY=... ./build/examples/deepseek_demo/deepseek-demo \
+  --user "Hello"
+```
 
 Next: [Examples](examples.md).

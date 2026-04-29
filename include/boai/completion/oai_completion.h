@@ -23,6 +23,7 @@
 #include <string>
 #include <vector>
 
+#include "bsrvcore/connection/client/http_client_task.h"
 #include "bsrvcore/core/types.h"
 
 namespace boai::completion {
@@ -31,18 +32,19 @@ namespace boai::completion {
  * @brief Provider connection information for chat completions.
  */
 struct OaiCompletionInfo {
-  std::string api_key;
-  std::string base_url;
-  std::optional<std::string> organization;
-  std::optional<std::string> project;
+  std::string api_key{};
+  std::string base_url{};
+  std::optional<std::string> organization{};
+  std::optional<std::string> project{};
+  bsrvcore::ProxyConfig proxy{};
 };
 
 /**
  * @brief Model selection and model-specific request parameters.
  */
 struct OaiModelInfo {
-  std::string model;
-  bsrvcore::JsonObject params;
+  std::string model{};
+  bsrvcore::JsonObject params{};
 };
 
 /**
@@ -58,29 +60,29 @@ enum class OaiCompletionStatus {
  * @brief Tool call object parsed from assistant responses.
  */
 struct OaiToolCall {
-  std::string id;
-  std::string name;
-  bsrvcore::JsonValue arguments;
+  std::string id{};
+  std::string name{};
+  bsrvcore::JsonValue arguments{};
 };
 
 /**
  * @brief Tool definition included in request payload (`tools`).
  */
 struct OaiToolDefinition {
-  std::string name;
-  std::string description;
-  bsrvcore::JsonObject parameters;
+  std::string name{};
+  std::string description{};
+  bsrvcore::JsonObject parameters{};
 };
 
 /**
  * @brief Chat message stored in state chain.
  */
 struct OaiMessage {
-  std::string role;
-  std::string message;
-  std::vector<OaiToolCall> tool_calls;
-  std::string reasoning;
-  std::string tool_call_id;
+  std::string role{};
+  std::string message{};
+  std::vector<OaiToolCall> tool_calls{};
+  std::string reasoning{};
+  std::string tool_call_id{};
 };
 
 /**
@@ -89,10 +91,10 @@ struct OaiMessage {
 struct OaiRequestLog {
   OaiCompletionStatus status{OaiCompletionStatus::kLocal};
   int http_status_code{0};
-  std::string error_message;
-  std::string request_id;
-  std::string finish_reason;
-  std::string model;
+  std::string error_message{};
+  std::string request_id{};
+  std::string finish_reason{};
+  std::string model{};
   bool is_stream{false};
   std::size_t delta_count{0};
   std::int64_t timestamp{0};

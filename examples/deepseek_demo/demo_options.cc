@@ -109,6 +109,9 @@ void PrintUsage(const char* argv0) {
       << "  --system <text>          Override the default system prompt\n"
       << "  --organization <org>     Optional OpenAI-compatible header\n"
       << "  --project <proj>         Optional OpenAI-compatible header\n"
+      << "  --proxy_host <host>      HTTP/HTTPS proxy host (env: BOAI_PROXY_HOST)\n"
+      << "  --proxy_port <port>      Proxy port (env: BOAI_PROXY_PORT)\n"
+      << "  --proxy_auth <auth>      Proxy-Authorization value (env: BOAI_PROXY_AUTH)\n"
       << "  -h, --help               Show this help\n\n"
       << "Interactive commands:\n"
       << "  :tools                   Print tool list\n"
@@ -164,6 +167,18 @@ bool ParseArgs(int argc, char** argv, Options* out, std::string* error_out) {
                      error_out)) {
       continue;
     }
+    if (ReadValueArg(&i, argc, argv, arg, "--proxy_host", &out->proxy_host,
+                     error_out)) {
+      continue;
+    }
+    if (ReadValueArg(&i, argc, argv, arg, "--proxy_port", &out->proxy_port,
+                     error_out)) {
+      continue;
+    }
+    if (ReadValueArg(&i, argc, argv, arg, "--proxy_auth", &out->proxy_auth,
+                     error_out)) {
+      continue;
+    }
     if (ReadValueArg(&i, argc, argv, arg, "--system", &out->system,
                      error_out)) {
       continue;
@@ -206,6 +221,21 @@ bool ParseArgs(int argc, char** argv, Options* out, std::string* error_out) {
       out->api_key = env;
     } else if (const char* env = GetEnv("OAI_API_KEY")) {
       out->api_key = env;
+    }
+  }
+  if (out->proxy_host.empty()) {
+    if (const char* env = GetEnv("BOAI_PROXY_HOST")) {
+      out->proxy_host = env;
+    }
+  }
+  if (out->proxy_port.empty()) {
+    if (const char* env = GetEnv("BOAI_PROXY_PORT")) {
+      out->proxy_port = env;
+    }
+  }
+  if (out->proxy_auth.empty()) {
+    if (const char* env = GetEnv("BOAI_PROXY_AUTH")) {
+      out->proxy_auth = env;
     }
   }
   if (out->system.empty()) {
