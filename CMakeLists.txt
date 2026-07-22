@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.25)
-project(boai VERSION 0.1.0 LANGUAGES CXX)
+project(boai VERSION 0.2.0 LANGUAGES CXX)
 
 if(POLICY CMP0167)
   if(APPLE)
@@ -48,7 +48,7 @@ set(BOAI_BSRVCORE_SOURCE_DIR "" CACHE PATH
 set(BOAI_BSRVCORE_GIT_REPOSITORY "https://github.com/haomingbai/bsrvcore.git"
   CACHE STRING "Git repository used when boai fetches bsrvcore."
 )
-set(BOAI_BSRVCORE_GIT_TAG "v0.18.2"
+set(BOAI_BSRVCORE_GIT_TAG "v0.20.1"
   CACHE STRING "Git ref used when boai fetches bsrvcore."
 )
 

@@ -80,8 +80,6 @@ ConnectionPipeline CreateConnectionPipeline(const OaiCompletionInfo& info,
     }
   }
 
-  assembler->SetStreamBuilder(builder);
-
   return {std::move(assembler), std::move(builder)};
 }
 

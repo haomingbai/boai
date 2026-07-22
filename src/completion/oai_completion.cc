@@ -96,7 +96,6 @@ bool OaiCompletionFactory::FetchCompletion(
       builder = ProxyStreamBuilder::Create(std::move(builder));
     }
   }
-  assembler->SetStreamBuilder(builder);
 
   HttpClientOptions options;
   options.connect_timeout = std::chrono::seconds(10);
@@ -133,13 +132,13 @@ bool OaiCompletionFactory::FetchCompletion(
         }
 
         std::shared_ptr<HttpClientTask> task;
-        if (slot.ssl_stream) {
+        if (slot.HasSslStream()) {
           task = HttpClientTask::CreateHttpsRaw(
-              executor_, std::move(*slot.ssl_stream), conn_host, conn_target,
+              executor_, std::move(slot.SslStreamRef()), conn_host, conn_target,
               http::verb::post, options);
         } else {
           task = HttpClientTask::CreateHttpRaw(
-              executor_, std::move(*slot.tcp_stream), conn_host, conn_target,
+              executor_, std::move(slot.TcpStreamRef()), conn_host, conn_target,
               http::verb::post, options);
         }
 
@@ -299,7 +298,6 @@ bool OaiCompletionFactory::FetchStreamCompletion(
       builder = ProxyStreamBuilder::Create(std::move(builder));
     }
   }
-  assembler->SetStreamBuilder(builder);
 
   HttpSseClientOptions options;
   options.connect_timeout = std::chrono::seconds(10);
@@ -352,13 +350,13 @@ bool OaiCompletionFactory::FetchStreamCompletion(
         }
 
         std::shared_ptr<HttpSseClientTask> client;
-        if (slot.ssl_stream) {
+        if (slot.HasSslStream()) {
           client = HttpSseClientTask::CreateHttpsRaw(
-              executor_, std::move(*slot.ssl_stream), conn_host, conn_target,
+              executor_, std::move(slot.SslStreamRef()), conn_host, conn_target,
               options);
         } else {
           client = HttpSseClientTask::CreateHttpRaw(
-              executor_, std::move(*slot.tcp_stream), conn_host, conn_target,
+              executor_, std::move(slot.TcpStreamRef()), conn_host, conn_target,
               options);
         }
 
